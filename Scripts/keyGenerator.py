@@ -7,21 +7,16 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from keyGeneration import keyGeneration
+from keyGeneration import keyGeneration, preComputeKey
+from checkPrime import checkPrime
 
 class Ui_windowKeyGenerator(object):
-    
-    def retrievePrimes(self):
-        p = int(self.inputP.toPlainText())
-        q = int(self.inputQ.toPlainText())
-        n, e, d = keyGeneration(p, q)
-        self.outputN.setText(str(n))
-        self.outputE.setText(str(e))
-        self.outputD.setText(str(d))
 
     def setupUi(self, windowKeyGenerator):
         windowKeyGenerator.setObjectName("windowKeyGenerator")
-        windowKeyGenerator.resize(800, 602)
+        windowKeyGenerator.resize(800, 600)
+        windowKeyGenerator.setMinimumSize(800, 600)
+        windowKeyGenerator.setMaximumSize(800, 600)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("../Images/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         windowKeyGenerator.setWindowIcon(icon)
@@ -58,6 +53,7 @@ class Ui_windowKeyGenerator(object):
         font.setPointSize(16)
         self.buttonDefault.setFont(font)
         self.buttonDefault.setObjectName("buttonDefault")
+        self.buttonDefault.clicked.connect(self.preComputeKey)
         self.labelOR = QtWidgets.QLabel(self.centralwidget)
         self.labelOR.setGeometry(QtCore.QRect(390, 220, 41, 51))
         font = QtGui.QFont()
@@ -77,7 +73,7 @@ class Ui_windowKeyGenerator(object):
         self.labelE.setFont(font)
         self.labelE.setObjectName("labelE")
         self.labelD = QtWidgets.QLabel(self.centralwidget)
-        self.labelD.setGeometry(QtCore.QRect(300, 480, 31, 41))
+        self.labelD.setGeometry(QtCore.QRect(180, 480, 31, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.labelD.setFont(font)
@@ -107,7 +103,7 @@ class Ui_windowKeyGenerator(object):
         self.outputE.setFont(font)
         self.outputE.setObjectName("outputE")
         self.outputD = QtWidgets.QTextEdit(self.centralwidget)
-        self.outputD.setGeometry(QtCore.QRect(330, 480, 161, 41))
+        self.outputD.setGeometry(QtCore.QRect(210, 480, 391, 41))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.outputD.setFont(font)
@@ -124,6 +120,67 @@ class Ui_windowKeyGenerator(object):
         self.retranslateUi(windowKeyGenerator)
         QtCore.QMetaObject.connectSlotsByName(windowKeyGenerator)
 
+
+    def preComputeKey(self):
+        n, e, d = preComputeKey()
+        self.outputN.setText(str(n))
+        self.outputE.setText(str(e))
+        self.outputD.setText(str(d))
+
+
+    def retrievePrimes(self):
+        x = self.inputP.toPlainText()
+        y = self.inputQ.toPlainText()
+
+        if (len(x) < 2 or len(y) < 2 or len(x) > 15 or len(y) > 15):
+            self.displayInfo("Input must be greater than 1 digit and less than 16 digits.")
+            return
+        
+        bad = False
+        if (x[0] == '0' or y[0] == '0'):
+            bad = True
+
+        for ch in x:
+            if (ch > '9' or ch < '0'):
+                bad = True
+                break
+        for ch in y:
+            if (ch > '9' or ch < '0'):
+                bad = True
+                break
+
+        if bad:
+            self.displayInfo("Input must be an integer and should not contain any leading zeros.")
+            return
+        
+        p = int(x)
+        q = int(y)
+        if (not checkPrime(p) or not checkPrime(q)):
+            self.displayInfo("Input must be a prime number.")
+            return
+
+        if (p * q < 256):
+            self.displayInfo("Product of primes must be greater than 255, because character is 8 bits long.")
+            return
+
+        n, e, d = keyGeneration(p, q)
+        if (not n):
+            self.displayInfo("Invalid input, try something else.")
+            return
+
+        self.outputN.setText(str(n))
+        self.outputE.setText(str(e))
+        self.outputD.setText(str(d))
+    
+
+    def displayInfo(self, message):
+        msg = QtWidgets.QMessageBox()
+        msg.setWindowTitle("Info")
+        msg.setText(message)
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.exec_()
+
+
     def retranslateUi(self, windowKeyGenerator):
         _translate = QtCore.QCoreApplication.translate
         windowKeyGenerator.setWindowTitle(_translate("windowKeyGenerator", "Key Generator"))
@@ -131,7 +188,7 @@ class Ui_windowKeyGenerator(object):
         self.labelP.setText(_translate("windowKeyGenerator", "P :"))
         self.labelQ.setText(_translate("windowKeyGenerator", "Q :"))
         self.buttonCustom.setText(_translate("windowKeyGenerator", "Generate using primes"))
-        self.buttonDefault.setText(_translate("windowKeyGenerator", "Generate 132 bit safe key"))
+        self.buttonDefault.setText(_translate("windowKeyGenerator", "Generate 128 bit safe key"))
         self.labelOR.setText(_translate("windowKeyGenerator", "OR"))
         self.labelN.setText(_translate("windowKeyGenerator", "N :"))
         self.labelE.setText(_translate("windowKeyGenerator", "E :"))
@@ -146,4 +203,3 @@ if __name__ == "__main__":
     ui.setupUi(windowKeyGenerator)
     windowKeyGenerator.show()
     sys.exit(app.exec_())
-

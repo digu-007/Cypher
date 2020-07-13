@@ -13,27 +13,11 @@ from decryption import Ui_windowDecryption
 
 class Ui_windowCypher(object):
     
-    def openKeyGenerator(self):
-        self.windowKeyGenerator = QtWidgets.QMainWindow()
-        self.ui = Ui_windowKeyGenerator()
-        self.ui.setupUi(self.windowKeyGenerator)
-        self.windowKeyGenerator.show()
-
-    def openEncryption(self):
-        self.windowEncryption = QtWidgets.QMainWindow()
-        self.ui = Ui_windowEncryption()
-        self.ui.setupUi(self.windowEncryption)
-        self.windowEncryption.show()
-
-    def openDecryption(self):
-        self.windowDecryption = QtWidgets.QMainWindow()
-        self.ui = Ui_windowDecryption()
-        self.ui.setupUi(self.windowDecryption)
-        self.windowDecryption.show()
-    
     def setupUi(self, windowCypher):
         windowCypher.setObjectName("windowCypher")
         windowCypher.resize(800, 600)
+        windowCypher.setMinimumSize(800, 600)
+        windowCypher.setMaximumSize(800, 600)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("../Images/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         windowCypher.setWindowIcon(icon)
@@ -60,6 +44,12 @@ class Ui_windowCypher(object):
         self.buttonEncrypt.setFont(font)
         self.buttonEncrypt.setObjectName("buttonEncrypt")
         self.buttonEncrypt.clicked.connect(self.openEncryption)
+        self.labelWelcome = QtWidgets.QLabel(self.centralwidget)
+        self.labelWelcome.setGeometry(QtCore.QRect(275, 60, 283, 41))
+        font = QtGui.QFont()
+        font.setPointSize(20)
+        self.labelWelcome.setFont(font)
+        self.labelWelcome.setObjectName("labelWelcome")
         windowCypher.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(windowCypher)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
@@ -72,13 +62,35 @@ class Ui_windowCypher(object):
         self.retranslateUi(windowCypher)
         QtCore.QMetaObject.connectSlotsByName(windowCypher)
 
+
+    def openKeyGenerator(self):
+        self.windowKeyGenerator = QtWidgets.QMainWindow()
+        self.ui = Ui_windowKeyGenerator()
+        self.ui.setupUi(self.windowKeyGenerator)
+        self.windowKeyGenerator.show()
+
+
+    def openEncryption(self):
+        self.windowEncryption = QtWidgets.QMainWindow()
+        self.ui = Ui_windowEncryption()
+        self.ui.setupUi(self.windowEncryption)
+        self.windowEncryption.show()
+
+
+    def openDecryption(self):
+        self.windowDecryption = QtWidgets.QMainWindow()
+        self.ui = Ui_windowDecryption()
+        self.ui.setupUi(self.windowDecryption)
+        self.windowDecryption.show()
+
+
     def retranslateUi(self, windowCypher):
         _translate = QtCore.QCoreApplication.translate
         windowCypher.setWindowTitle(_translate("windowCypher", "Cypher"))
         self.buttonGenerate.setText(_translate("windowCypher", "Generate Public-Private Key"))
         self.buttonDecrypt.setText(_translate("windowCypher", "Decrypt Message"))
         self.buttonEncrypt.setText(_translate("windowCypher", "Encrypt Message"))
-
+        self.labelWelcome.setText(_translate("windowCypher", "Welcome to Cypher!"))
 
 if __name__ == "__main__":
     import sys
@@ -88,4 +100,3 @@ if __name__ == "__main__":
     ui.setupUi(windowCypher)
     windowCypher.show()
     sys.exit(app.exec_())
-

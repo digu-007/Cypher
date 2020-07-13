@@ -11,17 +11,11 @@ from encryptText import encryptText
 
 class Ui_windowEncryption(object):
 
-    def encrypt(self):
-        n = int(self.inputN.toPlainText())
-        e = int(self.inputE.toPlainText())
-        s = self.inputText.toPlainText()
-        print(n, e, s)
-        print(encryptText(s, n, e))
-        self.outputText.setText(encryptText(s, n, e))
-
     def setupUi(self, windowEncryption):
         windowEncryption.setObjectName("windowEncryption")
         windowEncryption.resize(800, 600)
+        windowEncryption.setMinimumSize(800, 600)
+        windowEncryption.setMaximumSize(800, 600)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("../Images/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         windowEncryption.setWindowIcon(icon)
@@ -59,7 +53,7 @@ class Ui_windowEncryption(object):
         self.inputE.setFont(font)
         self.inputE.setObjectName("inputE")
         self.outputText = QtWidgets.QTextEdit(self.centralwidget)
-        self.outputText.setGeometry(QtCore.QRect(70, 60, 571, 261))
+        self.outputText.setGeometry(QtCore.QRect(70, 50, 571, 261))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.outputText.setFont(font)
@@ -82,13 +76,57 @@ class Ui_windowEncryption(object):
         self.retranslateUi(windowEncryption)
         QtCore.QMetaObject.connectSlotsByName(windowEncryption)
 
+
+    def encrypt(self):
+        x = self.inputN.toPlainText()
+        y = self.inputE.toPlainText()
+        s = self.inputText.toPlainText()
+
+        if (not len(x) or not len(y) or not len(s)):
+            self.displayInfo("Enter Input.")
+            return
+        
+        bad = False
+        if (x[0] == '0' or y[0] == '0'):
+            bad = True
+
+        for ch in x:
+            if (ch > '9' or ch < '0'):
+                bad = True
+                break
+        for ch in y:
+            if (ch > '9' or ch < '0'):
+                bad = True
+                break
+
+        if bad:
+            self.displayInfo("Input N or E must be positive integers and should not contain any leading zeros.")
+            return
+
+        n = int(x)
+        e = int(y)
+        if e < 3:
+            self.displayInfo("E must be greater than 2")
+            return
+
+        self.outputText.setText(encryptText(s, n, e))
+
+    
+    def displayInfo(self, message):
+        msg = QtWidgets.QMessageBox()
+        msg.setWindowTitle("Info")
+        msg.setText(message)
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.exec_()
+
+
     def retranslateUi(self, windowEncryption):
         _translate = QtCore.QCoreApplication.translate
         windowEncryption.setWindowTitle(_translate("windowEncryption", "Text Encryption"))
         self.labelN.setText(_translate("windowEncryption", "N :"))
         self.labelE.setText(_translate("windowEncryption", "E :"))
         self.buttonEncrypt.setText(_translate("windowEncryption", "Encrypt Text"))
-
+    
 
 if __name__ == "__main__":
     import sys
@@ -98,4 +136,3 @@ if __name__ == "__main__":
     ui.setupUi(windowEncryption)
     windowEncryption.show()
     sys.exit(app.exec_())
-

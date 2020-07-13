@@ -11,15 +11,11 @@ from decryptText import decryptText
 
 class Ui_windowDecryption(object):
 
-    def decrypt(self):
-        n = int(self.inputN.toPlainText())
-        d = int(self.inputD.toPlainText())
-        s = self.inputText.toPlainText()
-        self.outputText.setText(decryptText(s, n, d))
-
     def setupUi(self, windowDecryption):
         windowDecryption.setObjectName("windowDecryption")
         windowDecryption.resize(800, 600)
+        windowDecryption.setMinimumSize(800, 600)
+        windowDecryption.setMaximumSize(800, 600)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("../Images/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         windowDecryption.setWindowIcon(icon)
@@ -80,6 +76,47 @@ class Ui_windowDecryption(object):
         self.retranslateUi(windowDecryption)
         QtCore.QMetaObject.connectSlotsByName(windowDecryption)
 
+
+    def decrypt(self):
+        x = self.inputN.toPlainText()
+        y = self.inputD.toPlainText()
+        s = self.inputText.toPlainText()
+
+        if (not len(x) or not len(y) or not len(s)):
+            self.displayInfo("Enter Input.")
+            return
+        
+        bad = False
+        if (x[0] == '0' or y[0] == '0'):
+            bad = True
+
+        for ch in x:
+            if (ch > '9' or ch < '0'):
+                bad = True
+                break
+        for ch in y:
+            if (ch > '9' or ch < '0'):
+                bad = True
+                break
+
+        if bad:
+            self.displayInfo("Input N or D must be positive integers and should not contain any leading zeros.")
+            return
+
+        n = int(x)
+        d = int(y)
+
+        self.outputText.setText(decryptText(s, n, d))
+
+
+    def displayInfo(self, message):
+        msg = QtWidgets.QMessageBox()
+        msg.setWindowTitle("Info")
+        msg.setText(message)
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.exec_()
+
+
     def retranslateUi(self, windowDecryption):
         _translate = QtCore.QCoreApplication.translate
         windowDecryption.setWindowTitle(_translate("windowDecryption", "Text Decryption"))
@@ -96,4 +133,3 @@ if __name__ == "__main__":
     ui.setupUi(windowDecryption)
     windowDecryption.show()
     sys.exit(app.exec_())
-
